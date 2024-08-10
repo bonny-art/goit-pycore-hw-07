@@ -8,9 +8,11 @@ Classes:
 """
 
 from typing import List, Optional
+from datetime import datetime
 
 from .name import Name
 from .phone import Phone
+from .birthday import Birthday
 
 class Record:
     """
@@ -30,6 +32,7 @@ class Record:
         """
         self.name = Name(name)
         self.phones: List[Phone] = []
+        self.birthday = None
 
     def add_phone(self, phone_number: str) -> None:
         """
@@ -85,3 +88,15 @@ class Record:
         """
         phones_str = '; '.join(str(p) for p in self.phones)
         return f"Contact name: {self.name.value}, phones: {phones_str}"
+
+    def add_birthday(self, birthday: str) -> None:
+        """
+        Adds a birthday to the contact record. Raises an exception if the birthday is invalid.
+
+        Args:
+        - birthday (str): The birthday to add.
+        """
+        if self.birthday is None:
+            self.birthday = Birthday(birthday)
+        else:
+            raise ValueError("Birthday is already set")
