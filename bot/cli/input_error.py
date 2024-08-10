@@ -20,11 +20,11 @@ def input_error(func: Callable[..., str]) -> Callable[..., str]:
     def wrapper(*args: Any, **kwargs: Any) -> str:
         try:
             return func(*args, **kwargs)
-        except ValueError:
-            return "Give me name and phone, please."
-        except KeyError:
-            return "Contact not found."
-        except IndexError:
-            return "Give me name, please."
+        except ValueError as exc:
+            return str(exc) if str(exc) else "Give me name and phone, please."
+        except KeyError as exc:
+            return str(exc) if str(exc) else "Contact not found."
+        except IndexError as exc:
+            return str(exc) if str(exc) else "Give me name, please."
 
     return wrapper

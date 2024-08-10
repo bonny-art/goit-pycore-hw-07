@@ -3,17 +3,26 @@ This module provides functions to manage contacts using AddressBook, Record,
 Name, and Phone classes.
 
 Functions:
-- add_contact(args: list[str], address_book: AddressBook) -> str:
+- add_contact(args: List[str], address_book: AddressBook) -> str:
   Adds a new contact with the given name and phone number to the address book.
 
-- change_contact(args: list[str], address_book: AddressBook) -> str:
+- change_contact(args: List[str], address_book: AddressBook) -> str:
   Updates the phone number of an existing contact in the address book.
 
-- show_phone(args: list[str], address_book: AddressBook) -> str:
+- show_phone(args: List[str], address_book: AddressBook) -> str:
   Retrieves the phone number of a contact from the address book.
 
 - show_all(address_book: AddressBook) -> str:
   Retrieves all contacts stored in the address book.
+
+- add_birthday(args: List[str], address_book: AddressBook) -> str:
+  Adds a birthday to a contact or creates a new contact with the birthday.
+
+- show_birthday(args: List[str], address_book: AddressBook) -> str:
+  Retrieves the birthday of a contact from the address book.
+
+- birthdays(address_book: AddressBook) -> str:
+  Retrieves a list of upcoming birthdays from the address book.
 
 Usage:
 This module can be imported and used in other Python scripts to manage a collection
@@ -22,7 +31,6 @@ and retrieving contact information.
 """
 
 from typing import List
-
 from bot.models import AddressBook, Record
 from bot.cli.input_error import input_error
 
@@ -32,7 +40,7 @@ def add_contact(args: List[str], address_book: AddressBook) -> str:
     Add a new contact with the given name and phone number to the address book.
 
     Parameters:
-    args (list[str]): List of arguments containing name and phone number.
+    args (List[str]): List of arguments containing name and phone number.
     address_book (AddressBook): The address book where the contact will be added.
 
     Returns:
@@ -63,7 +71,7 @@ def change_contact(args: List[str], address_book: AddressBook) -> str:
     Update the phone number of an existing contact in the address book.
 
     Parameters:
-    args (list[str]): List of arguments containing name, old phone number, and new phone number.
+    args (List[str]): List of arguments containing name, old phone number, and new phone number.
     address_book (AddressBook): The address book where the contact exists.
 
     Returns:
@@ -91,7 +99,7 @@ def show_phone(args: List[str], address_book: AddressBook) -> str:
     Retrieve the phone number(s) of a contact from the address book.
 
     Parameters:
-    args (list[str]): List of arguments containing the name of the contact.
+    args (List[str]): List of arguments containing the name of the contact.
     address_book (AddressBook): The address book where the contact exists.
 
     Returns:
@@ -99,7 +107,7 @@ def show_phone(args: List[str], address_book: AddressBook) -> str:
     the contact was not found.
     """
     if len(args) != 1:
-        return "Give me only name."
+        return "Insufficient arguments. Usage: phone <name>"
 
     name_str = args[0]
     record = address_book.find(name_str)
@@ -108,7 +116,6 @@ def show_phone(args: List[str], address_book: AddressBook) -> str:
         return f"No contact found with name {name_str}."
 
     return str(record)
-
 
 @input_error
 def show_all(address_book: AddressBook) -> str:
@@ -126,11 +133,80 @@ def show_all(address_book: AddressBook) -> str:
 
     return str(address_book)
 
+@input_error
+def add_birthday(args: List[str], address_book: AddressBook) -> str:
+    """
+    Add a birthday to a contact or create a new contact with the birthday.
+
+    Parameters:
+    args (List[str]): List of arguments containing name and birthday.
+    address_book (AddressBook): The address book where the contact will be added or updated.
+
+    Returns:
+    str: Success or error message indicating whether the birthday was added successfully
+    or if there were insufficient arguments.
+    """
+    if len(args) < 2:
+        return "Insufficient arguments. Usage: add <name> <birthday>"
+
+    name_str, birthday_str = args
+
+    record = address_book.find(name_str)
+
+    if record:
+        record.add_birthday(birthday_str)
+        return f"Birthday added to existing contact {name_str}."
+
+    record = Record(name_str)
+    record.add_birthday(birthday_str)
+    address_book.add_record(record)
+    return "Contact with birthday added."
+
+@input_error
+def show_birthday(args: List[str], address_book: AddressBook) -> str:
+    """
+    Retrieve the birthday of a contact from the address book.
+
+    Parameters:
+    args (List[str]): List of arguments containing the name of the contact.
+    address_book (AddressBook): The address book where the contact exists.
+
+    Returns:
+    str: The birthday of the contact if found, otherwise a message indicating
+    the contact was not found.
+    """
+    if len(args) != 1:
+        return "Insufficient arguments. Usage: show-birthday <name>"
+
+    name_str = args[0]
+    record = address_book.find(name_str)
+
+    if not record:
+        return f"No contact found with name {name_str}."
+
+    return record.show_birthday()
+
+@input_error
+def birthdays(address_book: AddressBook) -> str:
+    """
+    Retrieve a list of upcoming birthdays from the address book.
+
+    Parameters:
+    address_book (AddressBook): The address book containing contacts.
+
+    Returns:
+    str: A list of upcoming birthdays or a message indicating there are no contacts.
+    """
+    if not address_book.data:
+        return "No contacts."
+
+    return address_book.get_upcoming_birthdays()
+
 
 if __name__ == "__main__":
     print()
 
-    contacts_list = {}
+    contacts_list = AddressBook()
 
     # Test show_all
     # Should show all contacts

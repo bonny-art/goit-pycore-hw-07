@@ -95,6 +95,15 @@ def main() -> None:
         elif command == "all":
             print(handlers.show_all(address_book))
 
+        elif command == "add-birthday":
+            print(handlers.add_birthday(args, address_book))
+
+        elif command == "show-birthday":
+            print(handlers.show_birthday(args, address_book))
+
+        elif command == "birthdays":
+            print(handlers.birthdays(address_book))
+
         else:
             print("Invalid command.")
 

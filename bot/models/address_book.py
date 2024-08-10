@@ -80,15 +80,6 @@ class AddressBook(UserDict):
         if name in self.data:
             del self.data[name]
 
-    def __str__(self) -> str:
-        """
-        Returns a string representation of all records in the address book.
-
-        Returns:
-            str: A string representing all records in the address book.
-        """
-        return "\n".join(str(record) for record in self.data.values())
-
     def _is_date_within_days(self, target_date: datetime, days: int) -> bool:
         """
         Checks if the target date falls within the given number of days from today.
@@ -128,14 +119,13 @@ class AddressBook(UserDict):
 
         return date_obj
 
-    def get_upcoming_birthdays(self) -> List[Dict[str, str]]:
+    def get_upcoming_birthdays(self) -> str:
         """
-        Returns a list of upcoming birthdays within the next 7 days.
+        Returns a formatted string of upcoming birthdays within the next 7 days.
 
         Returns:
-            List[Dict[str, str]]: A list of dictionaries, each containing
-                                  the name and birthday date of contacts
-                                  with upcoming birthdays.
+            str: A formatted string containing the name and birthday date of contacts
+                with upcoming birthdays.
         """
         upcoming_birthdays_list = []
         days = 7
@@ -159,12 +149,20 @@ class AddressBook(UserDict):
 
                         congratulation_date = self._adjust_to_weekday(congratulation_date)
 
-                        upcoming_birthdays_list.append({
-                            "name": record.name.value,
-                            "birthday": congratulation_date.strftime("%d.%m.%Y")
-                        })
+                        upcoming_birthdays_list.append(
+                            f"Contact name: {record.name.value}, birthday: {congratulation_date.strftime('%d.%m.%Y')}"
+                        )
 
                 except ValueError:
                     pass
 
-        return upcoming_birthdays_list
+        return "\n".join(upcoming_birthdays_list)
+
+    def __str__(self) -> str:
+        """
+        Returns a string representation of all records in the address book.
+
+        Returns:
+            str: A string representing all records in the address book.
+        """
+        return "\n".join(str(record) for record in self.data.values())

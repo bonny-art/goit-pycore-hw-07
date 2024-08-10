@@ -8,7 +8,6 @@ Classes:
 """
 
 from typing import List, Optional
-from datetime import datetime
 
 from .name import Name
 from .phone import Phone
@@ -61,8 +60,9 @@ class Record:
         - old_phone_number (str): The phone number to replace.
         - new_phone_number (str): The new phone number to add.
         """
-        self.remove_phone(old_phone_number)
+
         self.add_phone(new_phone_number)
+        self.remove_phone(old_phone_number)
 
     def find_phone(self, phone_number: str) -> Optional[Phone]:
         """
@@ -79,16 +79,6 @@ class Record:
                 return phone
         return None
 
-    def __str__(self) -> str:
-        """
-        Returns a string representation of the contact record.
-
-        Returns:
-        - str: A string describing the contact's name and phone numbers.
-        """
-        phones_str = '; '.join(str(p) for p in self.phones)
-        return f"Contact name: {self.name.value}, phones: {phones_str}"
-
     def add_birthday(self, birthday: str) -> None:
         """
         Adds a birthday to the contact record. Raises an exception if the birthday is invalid.
@@ -100,3 +90,32 @@ class Record:
             self.birthday = Birthday(birthday)
         else:
             raise ValueError("Birthday is already set")
+
+    def show_birthday(self) -> str:
+        """
+        Returns a string representation of the contact's birthday.
+
+        Returns:
+        - str: A string describing the contact's birthday.
+        """
+        if self.birthday is None:
+            return "No birthday set"
+        return f"{self.name.value}'s birthday is on {self.birthday.value.strftime('%d.%m.%Y')}"
+
+    def __str__(self) -> str:
+        """
+        Returns a string representation of the contact record.
+
+        Returns:
+        - str: A string describing the contact's name and phone numbers.
+        """
+        phones_str = '; '.join(str(p) for p in self.phones)
+        if not phones_str:
+            phones_str = "----------"
+
+        if self.birthday:
+            birthday_str = self.birthday.value.strftime("%d.%m.%Y")
+        else:
+            birthday_str = "----------"
+
+        return f"Contact name: {self.name.value}, birthday: {birthday_str}, phones: {phones_str}"
